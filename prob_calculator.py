@@ -5,34 +5,41 @@ import random
 
 class Hat:
     def __init__(self, **kwargs):
-        self.content = []
+        self.contents = []
         for key, value in kwargs.items():
-            self.content += [key] * value
+            self.contents += [key] * value
 
     def draw(self, qty):
-        if qty >= len(self.content):
-            drawn = self.content
-            self.content = []
+        if qty >= len(self.contents):
+            drawn = copy.copy(self.contents)
+            self.contents = []
         else:
             drawn = [self.pop_random_item() for i in range(qty)]
+
         return drawn
 
     def pop_random_item(self):
-        index = random.randrange(len(self.content))
-        return self.content.pop(index)
+        index = random.randrange(len(self.contents))
+        return self.contents.pop(index)
 
 
-def count_balls(balls):
-    counts = {}
+def contains_at_least(balls, expected_balls):
+    counts = copy.copy(expected_balls)
+
     for ball in balls:
-        counts[ball] = (counts.get(ball) or 0) + 1
-    return counts
+        if ball in counts:
+            counts[ball] -= 1
+
+    return all(value <= 0 for value in counts.values())
 
 
-# def experiment(hat, expected_balls, num_balls_drawn, num_experiments):
-hat = Hat(blue=4, red=2, green=6)
-print(hat.content)
-draw = hat.draw(33)
-print(draw)
-print(count_balls(draw))
-# print(hat.content)
+def experiment(hat, expected_balls, num_balls_drawn, num_experiments):
+    pass_count = 0
+
+    for i in range(num_experiments):
+        hat_copy = copy.deepcopy(hat)
+        draw = hat_copy.draw(num_balls_drawn)
+        if(contains_at_least(draw, expected_balls)):
+            pass_count += 1
+
+    return pass_count / num_experiments
