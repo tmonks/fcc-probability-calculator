@@ -10,36 +10,40 @@ class Hat:
             self.contents += [key] * value
 
     def draw(self, qty):
+        """ removes and returns `qty` balls from contents """
         if qty >= len(self.contents):
-            drawn = copy.copy(self.contents)
+            balls = copy.copy(self.contents)
             self.contents = []
         else:
-            drawn = [self.pop_random_item() for i in range(qty)]
+            balls = [self._draw_random_ball() for i in range(qty)]
 
-        return drawn
+        return balls
 
-    def pop_random_item(self):
+    def _draw_random_ball(self):
+        """ removes and returns one random ball from contents """
         index = random.randrange(len(self.contents))
         return self.contents.pop(index)
 
 
-def contains_at_least(balls, expected_balls):
-    counts = copy.copy(expected_balls)
+def contains(balls, expected_balls):
+    """ Checks if the list of balls contains the number of each color specified in `expected_balls`"""
+
+    expected_balls = copy.copy(expected_balls)
 
     for ball in balls:
-        if ball in counts:
-            counts[ball] -= 1
+        if ball in expected_balls:
+            expected_balls[ball] -= 1
 
-    return all(value <= 0 for value in counts.values())
+    return all(value <= 0 for value in expected_balls.values())
 
 
 def experiment(hat, expected_balls, num_balls_drawn, num_experiments):
-    pass_count = 0
+    passed = 0
 
-    for i in range(num_experiments):
+    for _ in range(num_experiments):
         hat_copy = copy.deepcopy(hat)
         draw = hat_copy.draw(num_balls_drawn)
-        if(contains_at_least(draw, expected_balls)):
-            pass_count += 1
+        if(contains(draw, expected_balls)):
+            passed += 1
 
-    return pass_count / num_experiments
+    return passed / num_experiments
